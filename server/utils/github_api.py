@@ -2,6 +2,7 @@
 import logging
 
 import httpx
+from server.utils.repo_to_text_utils import fetch_file_contents, fetch_repo_sha, fetch_repo_tree, format_repo_contents, parse_repo_url
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -44,3 +45,16 @@ class GithubClient:
             logger.error(f"Request error: {e}")
             raise httpx.RequestError(f"Failed to get {endpoint}: {str(e)}")
 
+
+
+    async def REPO_TO_TEXT(self, repo_url: str):
+        owner, repo, ref, path = parse_repo_url(repo_url)
+        sha = fetch_repo_sha(owner, repo, ref, path, self.api_key)
+        tree = fetch_repo_tree(owner, repo, sha, self.api_key)
+        blobs = [item for item in tree if item['type'] == 'blob']
+        common_exts = ('.py', '.js', '.ts', '.jsx', '.tsx', '.java', '.cpp', '.html', '.css')
+        selected_files = [item for item in blobs if item['path'].lower().endswith(common_exts)]
+        for item in selected_files:
+            item['url'] = f"https://api.github.com/repos/{owner}/{repo}/contents/{item['path']}?ref={ref}" if ref else f"https://api.github.com/repos/{owner}/{repo}/contents/{item['path']}"
+        contents = fetch_file_contents(selected_files,self. api_key)
+        return format_repo_contents(contents)

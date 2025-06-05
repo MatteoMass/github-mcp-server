@@ -53,7 +53,7 @@ def start_sse_server():
             )
 
         host = os.getenv("MCP_SERVER_HOST", "0.0.0.0")
-        port = int(os.getenv("MCP_SERVER_PORT", "8000"))
+        port = int(os.getenv("MCP_SERVER_PORT", "8002"))
 
         # Create Starlette app with MCP server mounted
         app = Starlette(
