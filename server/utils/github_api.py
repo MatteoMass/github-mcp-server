@@ -1,6 +1,4 @@
-# github_api.py
 import logging
-
 import httpx
 
 # Configure logging
@@ -23,24 +21,38 @@ class GithubClient:
         await self.client.aclose()
 
     async def GET(self, endpoint: str, params: dict = None):
-        headers = {
-            "Accept": "application/vnd.github+json",
-            "Authorization": f"Bearer {self.api_key}",
-            "X-GitHub-Api-Version": "2022-11-28",
-        }
+        return await self._request("get", endpoint, params=params)
+
+    async def POST(self, endpoint: str, json: dict):
+        return await self._request("post", endpoint, json=json)
+
+    async def PATCH(self, endpoint: str, json: dict):
+        return await self._request("patch", endpoint, json=json)
+
+    async def PUT(self, endpoint: str, json: dict = None):
+        return await self._request("put", endpoint, json=json)
+
+    async def _request(self, method: str, endpoint: str, **kwargs):
+        headers = self._get_headers()
 
         try:
-            response = await self.client.get(endpoint, params=params, headers=headers)
+            response = await self.client.request(method, endpoint, headers=headers, **kwargs)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
-            logger.error(f"HTTP error: {e}")
+            logger.error(f"HTTP error during {method.upper()} {endpoint}: {e}")
             raise httpx.HTTPStatusError(
-                f"Failed to get {endpoint}: {str(e)}",
+                f"Failed to {method.upper()} {endpoint}: {str(e)}",
                 request=e.request,
                 response=e.response,
             )
         except httpx.RequestError as e:
-            logger.error(f"Request error: {e}")
-            raise httpx.RequestError(f"Failed to get {endpoint}: {str(e)}")
+            logger.error(f"Request error during {method.upper()} {endpoint}: {e}")
+            raise httpx.RequestError(f"Failed to {method.upper()} {endpoint}: {str(e)}")
 
+    def _get_headers(self):
+        return {
+            "Accept": "application/vnd.github+json",
+            "Authorization": f"Bearer {self.api_key}",
+            "X-GitHub-Api-Version": "2022-11-28",
+        }
