@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir uv && \
 COPY . .
 
 # Expose port
-ENV MCP_SERVER_PORT=8000
+ENV MCP_SERVER_PORT=8002
 EXPOSE ${MCP_SERVER_PORT}
 
 # Run the application

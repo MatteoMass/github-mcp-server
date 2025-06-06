@@ -2,13 +2,7 @@
 This module contains tools for managing Github Issues
 """
 
-from server.tools import (
-    issues,
-    pull_requests,
-    repo,
-    branches,
-    contents
-)
+from server.tools import issues, pull_requests, repo, repo_to_text,branches, contents
 
 
 def register_tools(mcp):
@@ -33,3 +27,5 @@ def register_tools(mcp):
     mcp.add_tool(contents.get_file_contents)
 
     
+
+    mcp.add_tool(repo_to_text.get_repo_to_text)
