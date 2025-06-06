@@ -36,4 +36,13 @@ def github_help() -> str:
     return """
     Available Github Operations:
     1. get issues
+    2. create issue
+    3. comment issue
+    4. close issue
+    5. get pull requests
+    6. create pull request
+    7. get repo stats
+    8. list branches
+    9. get recent commits
+    10. get file contents
     """
